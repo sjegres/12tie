@@ -1,0 +1,129 @@
+$donut_segments: 20;
+$inner_segments: 6;
+$donut_radius: 100;
+$step: 360 / $donut_segments;
+$inner_step: 360 / $inner_segments;
+$donut_segments_list: ();
+
+@mixin rotate($cx, $cy, $x, $y, $angle) {
+  $radians: (pi()/180) * $angle;
+  $sin : sin($radians);
+  $cos : cos($radians);
+  $nx : ($cos * ($x - $cx)) + ($sin * ($y - $cy)) + $cx;
+  $ny : ($cos * ($y - $cy)) - ($sin * ($x - $cx)) + $cy;
+  transform: translate3D($nx, $ny, 0);
+}
+
+body{
+  background: #000;
+  font-family: 'Open Sans', Arial, sans-serif;
+  user-select: none;
+  
+  h1{
+    color: #fff;
+    text-align: center;
+    a{
+      color: #dedede;
+    }
+  }
+}
+.wrapper{
+  perspective: 1550px;
+  perspective-origin: 50% 50%;
+}
+.donut{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  transform-style: preserve-3d;
+  left: 50%;
+  top: 300px;
+  transform: translateX(-50%);
+  animation: rotate-body 5s linear infinite;
+  .transform:rotateY(60deg);
+}
+
+@for $i from 1 through $donut_segments{
+  .donut > div:nth-child(#{$i}){
+    transform: rotateZ(#{$step*$i}deg) translate(150px, -50%);
+    @for $j from 1 through $inner_segments{
+      > div > div > div:nth-child(#{$j}){
+        transform: rotateY(#{$inner_step*$j}deg) translate3D(0, 0, 47px);
+        background: hsla($step*$i, 50%, 50%, 1);
+      }
+    }
+  }
+}
+
+.donut > div{
+  position: absolute;
+  width: 100px;
+  height: 20px;
+  transform-style: preserve-3d;
+  transform-origin: 0% 0%;
+}
+
+.donut > div > div{
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform-origin: 0% 0%;
+}
+
+.donut > div > div > div{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+
+@for $i from 1 through $donut_segments{
+  .donut > div:nth-child(#{$i}) > div > div{
+    animation: rotate-segment-#{$i} 2s linear infinite;
+  }
+}
+
+.donut > div > div > div > div{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 53px;
+  height: 24px;
+  background: rgba(0, 0, 0, 1);
+  border: 2px solid rgba(255,255,255,1);
+  margin-left: -26.5px;
+  margin-top: -12px;
+  transform-origin: 50% 50%;
+}
+
+@keyframes rotate-segments {
+  from {
+    transform: rotateZ(40deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateZ(40deg) rotateY(360deg);
+  }
+}
+
+@keyframes rotate-body {
+  from {
+    transform:rotateY(360deg);
+  }
+  to {
+    transform:rotateY(0deg);
+  }
+}
+
+@for $i from 1 through $donut_segments{
+  @keyframes rotate-segment-#{$i} {
+    from {
+      transform: rotateZ(40deg) rotateY(#{$i * (180 / $donut_segments)}deg);
+    }
+    to {
+      transform: rotateZ(40deg) rotateY(#{$i * (180 / $donut_segments) + 360}deg);
+    }
+  }
+}
